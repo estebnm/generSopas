@@ -1,4 +1,4 @@
-=Generar Sopas
+Generar Sopas
 ==========
 
 Aplicacion para generar matrices que contienen palabras escondidas para ser utilizadas en la creacion de una sopa de letras
