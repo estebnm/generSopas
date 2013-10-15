@@ -1,0 +1,39 @@
+import webapp2
+import cgi
+import datetime
+import random
+import logging
+from google.appengine.api import memcache
+from google.appengine.ext import db
+
+
+class Word(db.Model):
+  """Modela una palabra."""
+  content = db.StringProperty()
+
+class MainPage(webapp2.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+		self.response.out.write(self.getRandomWord())
+
+	def getRandomWord(self):
+		words = self.getWords()
+		if words.count()!=0:
+			return words[random.randint(0, words.count()-1)].content
+		else:
+			return "aguacate"
+
+	def getWords(self):
+		words = memcache.get("words")
+		if words is not None:
+			logging.error("words is not None")
+			return words
+		else:
+			words = Word.all()
+			if not memcache.add(key="words", value=words, time=3600):
+				logging.error("Memcache set failed.")
+			return words
+
+app = webapp2.WSGIApplication([('/', MainPage),
+	                               ('/add', WordAdder)],
+	                              debug=True)
